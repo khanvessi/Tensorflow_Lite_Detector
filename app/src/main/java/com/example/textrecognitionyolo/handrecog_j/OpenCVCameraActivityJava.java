@@ -33,19 +33,20 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
 import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 import org.opencv.photo.CalibrateDebevec;
 import org.opencv.photo.MergeDebevec;
 import org.opencv.photo.MergeMertens;
 import org.opencv.photo.Photo;
 import org.opencv.photo.Tonemap;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -130,6 +131,7 @@ public class OpenCVCameraActivityJava extends AppCompatActivity implements CvCam
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -155,47 +157,70 @@ public class OpenCVCameraActivityJava extends AppCompatActivity implements CvCam
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-        matRGBA = inputFrame.rgba();
+        //matRGBA = inputFrame.rgba();
+        matRGBA = inputFrame.gray();
 
         String path = Environment.getExternalStorageDirectory().getPath();
 //        Mat response = new Mat();
 
 
+        Bitmap b2 = Bitmap.createBitmap(matRGBA.cols(), matRGBA.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(matRGBA, b2);
 
-        //METHOD 1
-//        byte[] array = new byte[bitmap.getWidth() * bitmap.getHeight() * 4];
+//        byte[] array = new byte[b2.getWidth() * b2.getHeight() * 4];
 //        Buffer dst = ByteBuffer.wrap(array);
-//        bitmap.copyPixelsFromBuffer(dst);
+//        b2.copyPixelsFromBuffer(dst);
 //
 //        byte[] ba = new byte[dst.remaining()];
+
+
+        InputStream bm = getResources().openRawResource(R.raw.eminem);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(bm);
+        Bitmap bmp = BitmapFactory.decodeStream(bufferedInputStream);
+
+        //COMPRESSED BITMAP BYTES
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        b2.recycle();
+
+
+
+//        int size = b2.getRowBytes() * b2.getHeight();
+//        ByteBuffer byteBuffer = ByteBuffer.allocate(size);
+//        b2.copyPixelsToBuffer(byteBuffer);
+//        byte[] byteArray = byteBuffer.array();
+
+
+        return matRGBA;
+
 //
         // RGBA BYTES
-        MatOfByte matOfByte = new MatOfByte();
-        Imgcodecs.imencode(".jpg", matRGBA, matOfByte);
-        byte[] rgbBytes = matOfByte.toArray();
-
-        Bitmap b = Bitmap.createBitmap(matRGBA.cols(), matRGBA.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(matRGBA, b);
-
-        //CONVERTING TO GRAY
-        Mat mGray = new Mat(b.getWidth(), b.getHeight(), CvType.CV_8UC1);
-        Utils.bitmapToMat(b, mGray);
-        Imgproc.cvtColor(mGray, mGray, Imgproc.COLOR_RGB2GRAY);
-
-
-        //GRAY BYTES
-        MatOfByte matOfByte1 = new MatOfByte();
-        Imgcodecs.imencode(".jpg", mGray, matOfByte1);
-        byte[] grayBytes = matOfByte1.toArray();
-
-        Bitmap b2 = Bitmap.createBitmap(mGray.cols(), mGray.rows(), Bitmap.Config.ARGB_8888);
-
-
-        Utils.matToBitmap(mGray, b2);
+//        MatOfByte matOfByte = new MatOfByte();
+//        Imgcodecs.imencode(".jpg", matRGBA, matOfByte);
+//        byte[] rgbBytes = matOfByte.toArray();
+//
+//        Bitmap b = Bitmap.createBitmap(matRGBA.cols(), matRGBA.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(matRGBA, b);
+//
+//        //CONVERTING TO GRAY
+//        Mat mGray = new Mat(b.getWidth(), b.getHeight(), CvType.CV_8UC1);
+//        Utils.bitmapToMat(b, mGray);
+//        Imgproc.cvtColor(mGray, mGray, Imgproc.COLOR_RGB2GRAY);
+//
+//
+//        //GRAY BYTES
+//        MatOfByte matOfByte1 = new MatOfByte();
+//        Imgcodecs.imencode(".jpg", mGray, matOfByte1);
+//        byte[] grayBytes = matOfByte1.toArray();
+//
+//        Bitmap b2 = Bitmap.createBitmap(mGray.cols(), mGray.rows(), Bitmap.Config.ARGB_8888);
+//
+//
+//        Utils.matToBitmap(mGray, b2);
 
 
         //opencvExposure(path, matRGBA);
-        return matRGBA;
     }
 
 
