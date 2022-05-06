@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.textrecognitionyolo.R;
+import com.example.textrecognitionyolo.objectDetectorClass;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
@@ -74,6 +75,9 @@ public class OpenCVCameraActivityJava extends AppCompatActivity implements CvCam
 
     //OPENCV Variables
     Mat matRGBA;
+    Mat matGray;
+
+    private com.example.textrecognitionyolo.objectDetectorClass objectDetectorClass;
 
     public OpenCVCameraActivityJava() {
         Log.i(TAG, "Instantiated new " + this.getClass());
@@ -140,7 +144,7 @@ public class OpenCVCameraActivityJava extends AppCompatActivity implements CvCam
         String currentDateandTime = sdf.format(new Date());
         String fileName = Environment.getExternalStorageDirectory().getPath() +
                 "/sample_picture_" + currentDateandTime + ".jpg";
-        mOpenCvCameraView.takePicture(fileName);
+       // mOpenCvCameraView.takePicture(fileName);
         Toast.makeText(this, fileName + " saved", Toast.LENGTH_SHORT).show();
 
         b = getBitmap(fileName);
@@ -157,32 +161,32 @@ public class OpenCVCameraActivityJava extends AppCompatActivity implements CvCam
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-        //matRGBA = inputFrame.rgba();
-        matRGBA = inputFrame.gray();
+        matRGBA = inputFrame.rgba();
+        matGray = inputFrame.gray();
 
         String path = Environment.getExternalStorageDirectory().getPath();
 //        Mat response = new Mat();
 
 
-        Bitmap b2 = Bitmap.createBitmap(matRGBA.cols(), matRGBA.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(matRGBA, b2);
-
-//        byte[] array = new byte[b2.getWidth() * b2.getHeight() * 4];
-//        Buffer dst = ByteBuffer.wrap(array);
-//        b2.copyPixelsFromBuffer(dst);
+//        Bitmap b2 = Bitmap.createBitmap(matRGBA.cols(), matRGBA.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(matRGBA, b2);
 //
-//        byte[] ba = new byte[dst.remaining()];
-
-
-        InputStream bm = getResources().openRawResource(R.raw.eminem);
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(bm);
-        Bitmap bmp = BitmapFactory.decodeStream(bufferedInputStream);
-
-        //COMPRESSED BITMAP BYTES
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        b2.recycle();
+////        byte[] array = new byte[b2.getWidth() * b2.getHeight() * 4];
+////        Buffer dst = ByteBuffer.wrap(array);
+////        b2.copyPixelsFromBuffer(dst);
+////
+////        byte[] ba = new byte[dst.remaining()];
+//
+//
+//        InputStream bm = getResources().openRawResource(R.raw.eminem);
+//        BufferedInputStream bufferedInputStream = new BufferedInputStream(bm);
+//        Bitmap bmp = BitmapFactory.decodeStream(bufferedInputStream);
+//
+//        //COMPRESSED BITMAP BYTES
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+//        byte[] byteArray = stream.toByteArray();
+//        b2.recycle();
 
 
 
@@ -192,7 +196,12 @@ public class OpenCVCameraActivityJava extends AppCompatActivity implements CvCam
 //        byte[] byteArray = byteBuffer.array();
 
 
-        return matRGBA;
+
+        // now call that function
+        Mat out=new Mat();
+        out=objectDetectorClass.recognizeImage(matGray);
+
+        return out;
 
 //
         // RGBA BYTES

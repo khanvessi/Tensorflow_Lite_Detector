@@ -6,6 +6,7 @@ dependencyResolutionManagement {
         jcenter() // Warning: this repository is going to shut down soon
     }
 }
-rootProject.name = "TextRecognitionYolo"
+rootProject.name = "Tensorflow_Lite_Detector"
 include ':app'
+include ':java'
 include ':sdk'
