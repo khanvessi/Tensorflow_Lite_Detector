@@ -21,6 +21,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.textrecognitionyolo.FacialExpressionRecognition;
 import com.example.textrecognitionyolo.R;
 import com.example.textrecognitionyolo.objectDetectorClass;
 
@@ -77,6 +78,8 @@ public class OpenCVCameraActivityJava extends AppCompatActivity implements CvCam
     Mat matRGBA;
     Mat matGray;
 
+    private FacialExpressionRecognition facialExpressionRecognition;
+
     private com.example.textrecognitionyolo.objectDetectorClass objectDetectorClass;
 
     public OpenCVCameraActivityJava() {
@@ -100,6 +103,26 @@ public class OpenCVCameraActivityJava extends AppCompatActivity implements CvCam
         } else {
             Log.e("tag", "Permissions granted");
             mOpenCvCameraView.setCameraPermissionGranted();
+        }
+
+        try{
+            // input size is 300 for this model
+            //objectDetectorClass=new objectDetectorClass(getAssets(),"custom_hand_model.tflite","labelmap.txt",320);
+            objectDetectorClass=new objectDetectorClass(getAssets(),"model_facial_expression.tflite","labelmap.txt",320);
+            Log.d("OpenCVCameraActivityJ","Model is successfully loaded");
+        }
+        catch (IOException e){
+            Log.d("MainActivity","Getting some error");
+            e.printStackTrace();
+        }
+
+        try {
+            facialExpressionRecognition = new FacialExpressionRecognition(getAssets(), OpenCVCameraActivityJava.this,
+                    "model_facial_expression.tflite", 48);
+
+
+        }catch (IOException e){
+            e.printStackTrace();
         }
     }
 
@@ -197,11 +220,19 @@ public class OpenCVCameraActivityJava extends AppCompatActivity implements CvCam
 
 
 
+        //===========OBJECDT DETECTION==================
         // now call that function
-        Mat out=new Mat();
-        out=objectDetectorClass.recognizeImage(matGray);
+//        Mat out=new Mat();
+//        out=objectDetectorClass.recognizeImage(matRGBA);
+//        return out;
+        //============================================
 
-        return out;
+        //EXPESSION RECOGNITION===================
+
+        matRGBA = facialExpressionRecognition.recognizeImage(matRGBA);
+        return matRGBA;
+
+
 
 //
         // RGBA BYTES

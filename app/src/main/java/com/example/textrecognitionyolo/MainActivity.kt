@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.AssetManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -17,7 +16,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import android.widget.Spinner
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -82,6 +80,19 @@ class MainActivity : AppCompatActivity() {
             recognizeActivity.putExtras(b)
             recognizeActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             startActivity(recognizeActivity)
+        })
+
+        binding.btnTfModel.setOnClickListener(View.OnClickListener {
+            //
+
+            //
+            startActivity(
+                Intent(
+                    this@MainActivity,
+                    StoragePrediction::class.java
+                ).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            )
+
         })
     }
 

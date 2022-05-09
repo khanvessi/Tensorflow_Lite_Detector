@@ -44,7 +44,7 @@ public class objectDetectorClass {
     private int height=0;
     private  int width=0;
 
-    objectDetectorClass(AssetManager assetManager,String modelPath, String labelPath,int inputSize) throws IOException{
+    public objectDetectorClass(AssetManager assetManager,String modelPath, String labelPath,int inputSize) throws IOException{
         INPUT_SIZE=inputSize;
         // use to define gpu or cpu // no. of threads
         Interpreter.Options options=new Interpreter.Options();
